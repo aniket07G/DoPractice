@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Dimensions, ActivityIndicator, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList } from "react-native";
 import Like from "react-native-vector-icons/FontAwesome";
 import Dislike from "react-native-vector-icons/FontAwesome";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,12 +19,17 @@ const CmpA = ({ navigation }) => {
 
     useEffect(() => {
         const fetchData = async () => {
+            let CombinedData = []
             try {
-                const response = await fetch('https://reqres.in/api/users?page=2');
-                const responseData = await response.json();
-                console.log(responseData.data);
-                setData(responseData.data);
-
+                for (let page = 1; page <= 2; page++) {
+                    const response = await fetch(`https://reqres.in/api/users?page=${page}`);
+                    const responseData = await response.json();
+                    console.log(page, responseData.data);
+                    for (let item = 0; item < responseData.data.length; item++) {
+                        CombinedData.push(responseData.data[item]);
+                    }
+                }
+                setData(CombinedData);
             } catch (error) {
                 console.log(error);
             }
@@ -48,7 +53,6 @@ const CmpA = ({ navigation }) => {
         try {
             const storedItems = await AsyncStorage.getItem('items');
             const mainData = storedItems != null ? JSON.parse(storedItems) : [];
-            console.log("mainData", mainData);
             return mainData;
         } catch (error) {
             console.error("Error in getItem:", error);
@@ -66,7 +70,6 @@ const CmpA = ({ navigation }) => {
                 break;
             }
         }
-        console.log("checking", isExist)
         if (!isExist) {
             await storeItem(data);
         }
@@ -82,7 +85,6 @@ const CmpA = ({ navigation }) => {
                 break;
             }
         }
-        console.log("isExisted", isExist)
         if (isExist) {
             const updatedItems = retrivedItems.filter(item => item.id !== data.id);
             await AsyncStorage.setItem('items', JSON.stringify(updatedItems));
@@ -109,6 +111,7 @@ const CmpA = ({ navigation }) => {
             </View>
             <FlatList
                 style={styles.flatlistContainer}
+                showsVerticalScrollIndicator={false}
                 data={data}
                 renderItem={({ item }) => (
                     <View style={styles.itemcontainer}>
@@ -121,7 +124,6 @@ const CmpA = ({ navigation }) => {
                                 <Text style={styles.nametext}>{item.last_name}</Text>
                             </View>
                             <Text style={styles.emailtext}>{item.email}</Text>
-
                         </View>
                         <View style={styles.iconcontainer}>
                             <TouchableOpacity onPress={() => handlelike(item)}>
@@ -135,8 +137,8 @@ const CmpA = ({ navigation }) => {
                 )}
 
             />
-            <TouchableOpacity style={styles.fvtcontainer} onPress={()=>navigation.navigate("CmpB")}>
-                <Text style={styles.fvttext}>Favourite Item</Text>
+            <TouchableOpacity style={styles.fvtcontainer} onPress={() => navigation.navigate("CmpB")}>
+                <Text style={styles.fvttext}>Favourite Items</Text>
             </TouchableOpacity>
 
         </View>
@@ -178,12 +180,11 @@ const styles = StyleSheet.create({
         height: windowHight * 0.1,
         justifyContent: 'center',
         alignItems: 'center',
-        flex: 1,
+        flex: 1.3,
     },
     namecontainer: {
         height: windowHight * 0.1,
         justifyContent: 'center',
-        paddingLeft: windowWidth * 0.03,
         flex: 3
     },
     iconcontainer: {
@@ -195,8 +196,8 @@ const styles = StyleSheet.create({
         gap: 13
     },
     avatarpic: {
-        width: 65,
-        height: 65,
+        width: 60,
+        height: 60,
         borderRadius: 50,
     },
     fullnamecontainer: {

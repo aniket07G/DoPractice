@@ -33,27 +33,31 @@ const CmpB = ({ navigation }) => {
                 <TouchableOpacity style={styles.arroback} onPress={() => handleBack()}>
                     <Back name='arrow-left-long' size={windowWidth * 0.08} color={'#FFFFFF'} />
                 </TouchableOpacity>
-                <Text style={styles.cmpbtext}>Favourite Item</Text>
+                <Text style={styles.cmpbtext}>Favourite Items</Text>
             </View>
-            <FlatList
-                style={styles.flatlistContainer}
-                data={data}
-                renderItem={({ item }) => (
-                    <View style={styles.itemcontainer}>
-                        <View style={styles.avatarcontainer}>
-                            <Image style={styles.avatarpic} source={{ uri: item.avatar }} />
-                        </View>
-                        <View style={styles.namecontainer}>
-                            <View style={styles.fullnamecontainer}>
-                                <Text style={styles.nametext}>{item.first_name}</Text>
-                                <Text style={styles.nametext}>{item.last_name}</Text>
+            {data.length > 0 ?
+                <FlatList
+                    style={styles.flatlistContainer}
+                    data={data}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item }) => (
+                        <View style={styles.itemcontainer}>
+                            <View style={styles.avatarcontainer}>
+                                <Image style={styles.avatarpic} source={{ uri: item.avatar }} />
                             </View>
-                            <Text style={styles.emailtext}>{item.email}</Text>
+                            <View style={styles.namecontainer}>
+                                <View style={styles.fullnamecontainer}>
+                                    <Text style={styles.nametext}>{item.first_name}</Text>
+                                    <Text style={styles.nametext}>{item.last_name}</Text>
+                                </View>
+                                <Text style={styles.emailtext}>{item.email}</Text>
 
+                            </View>
                         </View>
-                    </View>
-                )}
-            />
+                    )}
+                /> : <View style={styles.nofvtcontainer}>
+                    <Text style={{fontSize: windowWidth*0.05, fontWeight: '700'}}>No Favourite Items</Text>
+                </View>}
         </View>
     )
 }
@@ -101,12 +105,11 @@ const styles = StyleSheet.create({
     namecontainer: {
         height: windowHight * 0.1,
         justifyContent: 'center',
-        paddingLeft: windowWidth * 0.03,
         flex: 4
     },
     avatarpic: {
-        width: 65,
-        height: 65,
+        width: 60,
+        height: 60,
         borderRadius: 50,
     },
     fullnamecontainer: {
@@ -121,7 +124,11 @@ const styles = StyleSheet.create({
         fontSize: windowWidth * 0.03,
         color: '#28abfa'
     },
-
+    nofvtcontainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1
+    }
 })
 
 export default CmpB;
